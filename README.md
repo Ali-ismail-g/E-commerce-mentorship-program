@@ -89,4 +89,16 @@ WHERE EXTRACT(MONTH FROM o.order_date) = 2
 GROUP BY p.product_name , DATE_TRUNC('month', o.order_date)
 ORDER BY sold_quantity desc
 ```
+Write a SQL query to retrieve a list of customers who have placed orders totaling more than $500 in the past month.
+Include customer names and their total order amounts.
+===================
+```sql
+SELECT CONCAT(c.first_name,c.last_name) , SUM(od.quantity * od.unit_price) >= 500
+FROM customer c
+JOIN order o ON c.customer_id = o.customer_id
+JOIN order_details od ON od.order_id = o.order_id
+WHERE
+GROUP BY
+ORDER BY
+```
 
