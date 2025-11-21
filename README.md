@@ -42,7 +42,7 @@ category_name     VARCHAR(20) NOT NULL
 Order table
 ============
 ```sql
-CREATE TABLE order (
+CREATE TABLE orders (
 order_id         UUID NOT NULL PRIMARY KEY,
 total_amount     DECIMAL(10,2) NOT NULL,
 order_date       TIMESTAMP NOT NULL,
@@ -56,24 +56,24 @@ FOREIGN KEY (customer_id) REFERENCES customer(customer_id)
 Order_details table
 ===================
 ```sql
-CREATE TABLE order_details (
+CREATE TABLE orders_details (
 order_details_id   UUID NOT NULL PRIMARY KEY,
 quantity           int NOT NULL,
 unit_price         DECIMAL(10,2) NOT NULL,
 order_id           UUID NOT NULL,
-FOREIGN KEY (order_id) REFERENCES order(order_id)
+FOREIGN KEY (order_id) REFERENCES orders(order_id)
 )
 ```
 ==============
 # ERD daigram
-<img width="768" height="771" alt="e-commerceERD drawio" src="https://github.com/user-attachments/assets/928cb2b9-eff6-4dde-b652-dd7e0a569311" />
+<img width="768" height="771" alt="e-commerceERD drawio" src="https://github.com/user-attachments/assets/31dc9ce8-59bd-421d-84ea-32ad85ee82dc" />
 
 
 Write an SQL query to generate a daily report of the total revenue for a specific date.
 ===================
 ```sql
 SELECT o.order_date , SUM(od.quantity * od.unit_price) AS total_revenue
-FROM order o join order_details od
+FROM orders o join orders_details od
 ON o.order_id = od.order_id
 WHERE o.order_date::date = '2025-11-21'
 GROUP BY o.order_date
@@ -83,8 +83,8 @@ Write an SQL query to generate a monthly report of the top-selling products in a
 ```sql
 SELECT p.product_name , SUM(od.quantity) AS sold_quantity, DATE_TRUNC('month', o.order_date) AS month
 FROM product p
-JOIN order o ON p.product_id = o.product_id
-JOIN order_details od ON od.order_id = o.order_id
+JOIN orders o ON p.product_id = o.product_id
+JOIN orders_details od ON od.order_id = o.order_id
 WHERE EXTRACT(MONTH FROM o.order_date) = 2
 GROUP BY p.product_name , DATE_TRUNC('month', o.order_date)
 ORDER BY sold_quantity desc
@@ -93,12 +93,14 @@ Write a SQL query to retrieve a list of customers who have placed orders totalin
 Include customer names and their total order amounts.
 ===================
 ```sql
-SELECT CONCAT(c.first_name,c.last_name) , SUM(od.quantity * od.unit_price) >= 500
+SELECT CONCAT(c.first_name,' ',c.last_name) AS full_name , SUM(od.quantity * od.unit_price) AS total_price
 FROM customer c
-JOIN order o ON c.customer_id = o.customer_id
-JOIN order_details od ON od.order_id = o.order_id
-WHERE
-GROUP BY
-ORDER BY
+JOIN orders o ON c.customer_id = o.customer_id
+JOIN orders_details od ON od.order_id = o.order_id
+WHERE o.order_date BETWEEN DATE_TRUNC('month', CURRENT_DATE) - INTERVAL '1 month' 
+      AND DATE_TRUNC('month', CURRENT_DATE) - INTERVAL '1 second'
+GROUP BY c.first_name, c.last_name
+HAVING SUM(od.quantity * od.unit_price) >= 500
+ORDER BY total_price
 ```
 
