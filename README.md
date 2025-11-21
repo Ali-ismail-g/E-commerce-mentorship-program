@@ -44,11 +44,11 @@ Order table
 ```sql
 CREATE TABLE order (
 order_id         UUID NOT NULL PRIMARY KEY,
-total_amount     int NOT NULL,
+total_amount     DECIMAL(10,2) NOT NULL,
 order_date       TIMESTAMP NOT NULL,
 customer_id      UUID NOT NULL,
-category_id      UUID NOT NULL
-FOREIGN KEY (category_id) REFERENCES category(category_id)
+product_id       UUID NOT NULL
+FOREIGN KEY (product_id) REFERENCES product(product_id),
 FOREIGN KEY (customer_id) REFERENCES customer(customer_id)
 )
 ```
@@ -60,12 +60,33 @@ CREATE TABLE order_details (
 order_details_id   UUID NOT NULL PRIMARY KEY,
 quantity           int NOT NULL,
 unit_price         DECIMAL(10,2) NOT NULL,
-order_id        UUID NOT NULL
+order_id           UUID NOT NULL,
 FOREIGN KEY (order_id) REFERENCES order(order_id)
 )
 ```
 ==============
 # ERD daigram
-<img width="748" height="771" alt="e-commerceERD drawio" src="https://github.com/user-attachments/assets/4925069b-6402-4952-a9b6-a86e47eaaf45" />
+<img width="768" height="771" alt="e-commerceERD drawio" src="https://github.com/user-attachments/assets/928cb2b9-eff6-4dde-b652-dd7e0a569311" />
 
+
+Write an SQL query to generate a daily report of the total revenue for a specific date.
+===================
+```sql
+SELECT o.order_date , SUM(od.quantity * od.unit_price) AS total_revenue
+FROM order o join order_details od
+ON o.order_id = od.order_id
+WHERE o.order_date::date = '2025-11-21'
+GROUP BY o.order_date
+```
+Write an SQL query to generate a monthly report of the top-selling products in a given month.
+===================
+```sql
+SELECT p.product_name , SUM(od.quantity) AS sold_quantity, DATE_TRUNC('month', o.order_date) AS month
+FROM product p
+JOIN order o ON p.product_id = o.product_id
+JOIN order_details od ON od.order_id = o.order_id
+WHERE EXTRACT(MONTH FROM o.order_date) = 2
+GROUP BY p.product_name , DATE_TRUNC('month', o.order_date)
+ORDER BY sold_quantity desc
+```
 
