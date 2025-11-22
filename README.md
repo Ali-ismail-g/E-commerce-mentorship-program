@@ -103,4 +103,13 @@ GROUP BY c.first_name, c.last_name
 HAVING SUM(od.quantity * od.unit_price) >= 500
 ORDER BY total_price
 ```
-
+How we can apply a denormalization mechanism on customer and order entities.
+===================
+Denormalization is the process of combining tables or adding redundant data to make queries faster.
+so applying this concept on customer and order entities will make queries read faster and it's ok if it will reduce complex joins so the result entity will be:
+```sql
+ALTER TABLE customer
+ADD COLUMN total_amount DECIMAL(10,2) DEFAULT 0,
+ADD COLUMN order_date TIMESTAMP,
+ADD COLUMN order_count INT DEFAULT 0;
+```
