@@ -113,3 +113,10 @@ ADD COLUMN total_amount DECIMAL(10,2) DEFAULT 0,
 ADD COLUMN order_date TIMESTAMP,
 ADD COLUMN order_count INT DEFAULT 0;
 ```
+Write a SQL query to search for all products with the word "camera" in either the product name or description.
+===================
+```sql
+SELECT *
+FROM Product
+WHERE product_name LIKE '%camera%' OR description LIKE '%camera%';
+```
