@@ -5,12 +5,11 @@
 
 Product table
 ==============
-
 ```sql
 CREATE TABLE product (
-    product_id      UUID NOT NULL PRIMARY KEY,
-    product_name    VARCHAR(20) NOT NULL,
-    description     VARCHAR(50),
+    product_id      UUID PRIMARY KEY,
+    product_name    VARCHAR(100) NOT NULL,
+    description     VARCHAR(255),
     price           DECIMAL(10,2) NOT NULL,
     stock_quantity  INT DEFAULT 0,
     seller_id       UUID NOT NULL,
@@ -24,21 +23,21 @@ Customer table
 ==============
 ```sql
 CREATE TABLE customer (
-customer_id      UUID NOT NULL PRIMARY KEY,
-first_name       VARCHAR(30) NOT NULL,
-last_name        VARCHAR(30) NOT NULL,
-email            VARCHAR(30) NOT NULL,
-password         VARCHAR(10) NOT NULL
-)
+    customer_id      UUID PRIMARY KEY,
+    first_name       VARCHAR(100) NOT NULL,
+    last_name        VARCHAR(100) NOT NULL,
+    email            VARCHAR(100) NOT NULL,
+    password         VARCHAR(100) NOT NULL
+);
 ```
 
 Category table
 ==============
 ```sql
 CREATE TABLE category (
-category_id       UUID NOT NULL PRIMARY KEY,
-category_name     VARCHAR(20) NOT NULL
-)
+    category_id       UUID PRIMARY KEY,
+    category_name     VARCHAR(50) NOT NULL
+);
 ```
 
 Order table
@@ -49,10 +48,8 @@ order_id         UUID NOT NULL PRIMARY KEY,
 total_amount     DECIMAL(10,2) NOT NULL,
 order_date       TIMESTAMP NOT NULL,
 customer_id      UUID NOT NULL,
-product_id       UUID NOT NULL
-FOREIGN KEY (product_id) REFERENCES product(product_id),
 FOREIGN KEY (customer_id) REFERENCES customer(customer_id)
-)
+);
 ```
 
 Order_details table
@@ -60,14 +57,16 @@ Order_details table
 ```sql
 CREATE TABLE orders_details (
 order_details_id   UUID NOT NULL PRIMARY KEY,
-quantity           int NOT NULL,
+quantity           INT NOT NULL,
 unit_price         DECIMAL(10,2) NOT NULL,
 order_id           UUID NOT NULL,
-FOREIGN KEY (order_id) REFERENCES orders(order_id)
-)
+product_id         UUID NOT NULL,
+FOREIGN KEY (order_id) REFERENCES orders(order_id),
+FOREIGN KEY (product_id) REFERENCES product(product_id)
+);
 ```
 
-seller table
+Seller table
 ===================
 ```sql
 CREATE TABLE seller (
@@ -75,16 +74,18 @@ CREATE TABLE seller (
     seller_name VARCHAR(50) NOT NULL
 );
 ```
-product_review table
+
+Product_review table
 ===================
 ```sql
 CREATE TABLE product_review (
     review_id    UUID PRIMARY KEY,
     product_id   UUID NOT NULL,
-    user_id      UUID NOT NULL,
+    customer_id  UUID NOT NULL,
     rating       INT CHECK (rating BETWEEN 1 AND 5),
     review_text  TEXT,
     created_at   TIMESTAMP DEFAULT NOW(),
+    FOREIGN KEY (customer_id) REFERENCES customer(customer_id),
     FOREIGN KEY (product_id) REFERENCES product(product_id)
 );
 ```
@@ -141,12 +142,23 @@ Write a SQL query to search for all products with the word "camera" in either th
 ===================
 ```sql
 SELECT *
-FROM Product
+FROM product
 WHERE product_name LIKE '%camera%' OR description LIKE '%camera%';
 ```
 Can you design a query to suggest popular products in the same category for the same author,
-excluding the Purchsed product from the recommendations?
+excluding the Purchased product from the recommendations?
 ===================
-```sql
+Let's assume the purchased_product_id = '660e8400-s29b-48p4-c744-440055442011'
 
+```sql
+SELECT p.product_id, p.product_name, c.category_name,s.seller_name, AVG(pr.rating) AS Rating
+FROM category c
+JOIN product p ON c.category_id = p.category_id
+JOIN seller s ON s.seller_id = p.seller_id
+JOIN product_review pr ON pr.product_id = p.product_id
+WHERE p.category_id = (SELECT category_id FROM product WHERE product_id = '660e8400-s29b-48p4-c744-440055442011')
+AND p.seller_id = (SELECT seller_id FROM product WHERE product_id = '660e8400-s29b-48p4-c744-440055442011')
+AND p.product_id <> '660e8400-s29b-48p4-c744-440055442011'
+GROUP BY p.product_id, p.product_name, c.category_name, s.seller_name
+ORDER BY Rating;
 ```
