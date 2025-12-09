@@ -13,8 +13,10 @@ CREATE TABLE product (
     description     VARCHAR(50),
     price           DECIMAL(10,2) NOT NULL,
     stock_quantity  INT DEFAULT 0,
+    seller_id       UUID NOT NULL,
     category_id     UUID NOT NULL,
-    FOREIGN KEY (category_id) REFERENCES category(category_id)
+    FOREIGN KEY (category_id) REFERENCES category(category_id),
+    FOREIGN KEY (seller_id) REFERENCES seller(seller_id)
 );
 ```
 
@@ -63,6 +65,28 @@ unit_price         DECIMAL(10,2) NOT NULL,
 order_id           UUID NOT NULL,
 FOREIGN KEY (order_id) REFERENCES orders(order_id)
 )
+```
+
+seller table
+===================
+```sql
+CREATE TABLE seller (
+    seller_id   UUID PRIMARY KEY,
+    seller_name VARCHAR(50) NOT NULL
+);
+```
+product_review table
+===================
+```sql
+CREATE TABLE product_review (
+    review_id    UUID PRIMARY KEY,
+    product_id   UUID NOT NULL,
+    user_id      UUID NOT NULL,
+    rating       INT CHECK (rating BETWEEN 1 AND 5),
+    review_text  TEXT,
+    created_at   TIMESTAMP DEFAULT NOW(),
+    FOREIGN KEY (product_id) REFERENCES product(product_id)
+);
 ```
 ==============
 # ERD daigram
@@ -119,4 +143,10 @@ Write a SQL query to search for all products with the word "camera" in either th
 SELECT *
 FROM Product
 WHERE product_name LIKE '%camera%' OR description LIKE '%camera%';
+```
+Can you design a query to suggest popular products in the same category for the same author,
+excluding the Purchsed product from the recommendations?
+===================
+```sql
+
 ```
