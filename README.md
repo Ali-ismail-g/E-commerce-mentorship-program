@@ -129,3 +129,37 @@ WHERE product_id NOT IN
 AND category_id IN
 (SELECT category_id FROM order_history WHERE customer_id = <cusotmer_ID>)
 ```
+Can you design a Procedure with transaction to create new order.
+===================
+```sql
+CREATE OR REPLACE PROCEDURE create_order (
+
+)
+LANGUAGE plpgsql
+AS $$
+DECLARE
+    v_totalamount DECIMAL(10,2)
+    v_unit_price  DECIMAL(10,2)
+BEGIN
+    BEGIN
+        SELECT 
+    END;
+END;
+$$
+```
+Can you design a Trigger automatically generates a order history record after insertion in (Order_Details) table.
+===================
+```sql
+```
+Can you design a Trigger automatically updates total_amount column in order history table after the (total_amount) column in (orders) table is updated.
+===================
+```sql
+```
+Can you design a Transaction query to lock the field quantity for a given product_id from being updated
+===================
+```sql
+```
+Can you design a Transaction query to lock row for a given product_id from being updated.
+===================
+```sql
+```
