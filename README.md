@@ -158,8 +158,14 @@ Can you design a Trigger automatically updates total_amount column in order hist
 Can you design a Transaction query to lock the field quantity for a given product_id from being updated
 ===================
 ```sql
+BEGIN;
+SELECT product_id FROM Product WHERE product_id = <product_id> FOR UPDATE;
+COMMIT;
 ```
 Can you design a Transaction query to lock row for a given product_id from being updated.
 ===================
 ```sql
+BEGIN;
+SELECT * FROM Product WHERE product_id = <product_id> FOR UPDATE;
+COMMIT;
 ```
