@@ -65,7 +65,8 @@ FOREIGN KEY (product_id) REFERENCES product(product_id)
 ```
 ==============
 # ERD daigram
-<img width="768" height="771" alt="e-commerceERD drawio" src="https://github.com/user-attachments/assets/31dc9ce8-59bd-421d-84ea-32ad85ee82dc" />
+<img width="768" height="771" alt="e-commerceERD drawio" src="https://github.com/user-attachments/assets/63bb4734-2e80-4837-878f-f49327d76d66" />
+
 
 
 Write an SQL query to generate a daily report of the total revenue for a specific date.
